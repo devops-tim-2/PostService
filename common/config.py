@@ -3,7 +3,7 @@ from typing import Tuple
 from flask_cors import CORS
 from flask.app import Flask
 from flask_sqlalchemy import SQLAlchemy
-# from routes.product_routes import product_api
+from routes.post_routes import post_api
 # from routes.order_routes import order_api
 # from routes.report_routes import report_api
 # from routes.user_routes import user_api
@@ -49,7 +49,7 @@ config: dict = {
 def setup_config(cfg_name: str) -> Tuple[Flask, SQLAlchemy]:
     app = Flask(__name__)
     CORS(app)
-    # app.register_blueprint(product_api, url_prefix='/api/product')
+    app.register_blueprint(post_api, url_prefix='/api/post')
     # app.register_blueprint(order_api, url_prefix='/api/order')
     # app.register_blueprint(report_api, url_prefix='/api/report')
     # app.register_blueprint(user_api)
@@ -70,8 +70,8 @@ def setup_config(cfg_name: str) -> Tuple[Flask, SQLAlchemy]:
         Favorite.query.delete()
         Follow.query.delete()
         Like.query.delete()
-        Post.query.delete()
         Tagged.query.delete()
+        Post.query.delete()
         User.query.delete()
 
     return app, db
