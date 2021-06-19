@@ -4,8 +4,10 @@ from flask_cors import CORS
 from flask.app import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
+from flask_restful import Api
 from common.database import db
 from models.models import Block, Comment, Favorite, Follow, Like, Post, Tagged, User
+from routes.post_routes import PostResource, PostListResource, ProfileResource, LikeResource, DislikeResource, FavoriteResource, CommentResource
 
 
 DevConfig = {
@@ -47,6 +49,17 @@ def setup_config(cfg_name: str) -> Tuple[Flask, SQLAlchemy]:
         
     CORS(app, resources={r"/*": {"origins": "http://localhost:3000", "send_wildcard": "False"}})
 
+    api = Api(app)
+
+    
+    api.add_resource(PostResource, '/api/<post_id>')
+    api.add_resource(PostListResource, '/api')
+    api.add_resource(ProfileResource, '/api/profile/<user_id>')
+    api.add_resource(LikeResource, '/api/like/<post_id>')
+    api.add_resource(DislikeResource, '/api/dislike/<post_id>')
+    api.add_resource(FavoriteResource, '/api/favorite/<post_id>')
+    api.add_resource(CommentResource, '/api/comment/<post_id>')
+
     cfg = config.get(cfg_name)
     for key in cfg.keys():
         app.config[key] = cfg[key]
@@ -63,8 +76,8 @@ def setup_config(cfg_name: str) -> Tuple[Flask, SQLAlchemy]:
         Favorite.query.delete()
         Follow.query.delete()
         Like.query.delete()
-        Post.query.delete()
         Tagged.query.delete()
+        Post.query.delete()
         User.query.delete()
 
     return app, db
