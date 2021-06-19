@@ -3,19 +3,11 @@ from typing import Tuple
 from flask_cors import CORS
 from flask.app import Flask
 from flask_sqlalchemy import SQLAlchemy
-from routes.post_routes import post_api
-# from routes.order_routes import order_api
-# from routes.report_routes import report_api
-# from routes.user_routes import user_api
+from flask_wtf import CSRFProtect
+from flask_restful import Api
 from common.database import db
-from models.block import Block
-from models.comment import Comment
-from models.favorite import Favorite
-from models.follow import Follow
-from models.like import Like
-from models.post import Post
-from models.tagged import Tagged
-from models.user import User
+from models.models import Block, Comment, Favorite, Follow, Like, Post, Tagged, User
+from routes.post_routes import PostResource, PostListResource, ProfileResource, LikeResource, DislikeResource, FavoriteResource, CommentResource
 
 
 DevConfig = {
@@ -48,11 +40,25 @@ config: dict = {
 
 def setup_config(cfg_name: str) -> Tuple[Flask, SQLAlchemy]:
     app = Flask(__name__)
-    CORS(app)
-    app.register_blueprint(post_api, url_prefix='/api/post')
-    # app.register_blueprint(order_api, url_prefix='/api/order')
-    # app.register_blueprint(report_api, url_prefix='/api/report')
-    # app.register_blueprint(user_api)
+
+    if environ.get('ENABLE_CSRF') == 1:
+        app.config['SECRET_KEY'] = environ.get('SECRET_KEY')
+        app.config['WTF_CSRF_SECRET_KEY'] = environ.get('WTF_CSRF_SECRET_KEY')
+        csrf = CSRFProtect()
+        csrf.init_app(app)
+        
+    CORS(app, resources={r"/*": {"origins": "http://localhost:3000", "send_wildcard": "False"}})
+
+    api = Api(app)
+
+    
+    api.add_resource(PostResource, '/api/<post_id>')
+    api.add_resource(PostListResource, '/api')
+    api.add_resource(ProfileResource, '/api/profile/<user_id>')
+    api.add_resource(LikeResource, '/api/like/<post_id>')
+    api.add_resource(DislikeResource, '/api/dislike/<post_id>')
+    api.add_resource(FavoriteResource, '/api/favorite/<post_id>')
+    api.add_resource(CommentResource, '/api/comment/<post_id>')
 
     cfg = config.get(cfg_name)
     for key in cfg.keys():

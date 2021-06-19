@@ -1,87 +1,78 @@
-# from common.utils import auth
-from flask import Blueprint, request
-# from services import post_service
+from flask_restful import Resource, reqparse
+ 
+post_parser = reqparse.RequestParser()
+post_parser.add_argument('description', type=str, help='Description for post')
+post_parser.add_argument('image_url', type=str, help='Image url for post')
+ 
+comment_parser = reqparse.RequestParser()
+comment_parser.add_argument('text', type=str, help='Text of the comment')
 
-post_api = Blueprint('order_api', __name__)
+ 
+class PostResource(Resource):
+    def __init__(self):
+        # To be implemented.
+        pass
+ 
+    def get(self, post_id):
+        # To be implemented.
+        pass
 
+    def delete(self, post_id):
+        # To be implemented.
+        pass
+ 
+class PostListResource(Resource):
+    def __init__(self):
+        # To be implemented.
+        pass
+ 
+    def post(self):
+        # To be implemented.
+        pass
+ 
+class ProfileResource(Resource):
+    def __init__(self):
+        # To be implemented.
+        pass
+ 
+    def get(self, user_id):
+        # To be implemented.
+        pass
+ 
+class LikeResource(Resource):
+    def __init__(self):
+        # To be implemented.
+        pass
+ 
+    def get(self, post_id):
+        # To be implemented.
+        pass
 
-@post_api.route('/profile/<int:user_id>', methods=["GET"])
-def get_users_posts(user_id: int):
-    # result, code = auth(request.headers)
-    # if code != 200:
-    #     result, code
+class DislikeResource(Resource):
+    def __init__(self):
+        # To be implemented.
+        pass
+ 
+    def get(self, post_id):
+        # To be implemented.
+        pass
 
-    # return post_service.get_users_posts(user_id, result)
-    return "OK", 200
-
-
-@post_api.route('/<int:post_id>', methods=["GET"])
-def get(post_id: int):
-    # result, code = auth(request.headers)
-    # if code != 200:
-    #     result, code
-
-    # return post_service.get(post_id, result)
-    return "OK", 200
-
-
-@post_api.route('', methods=["POST"])
-def create():
-    # result, code = auth(request.headers)
-    # if code != 200:
-    #     result, code
-
-    # data = request.get_json()
-    # return post_service.create(data, result)
-    return "OK", 200
-
-
-@post_api.route('/like/<int:post_id>', methods=["PUT"])
-def like(post_id: int):
-    # result, code = auth(request.headers)
-    # if code != 200:
-    #     result, code
-
-    # return post_service.like(post_id, result)
-    return "OK", 200
-
-
-@post_api.route('/dislike/<int:post_id>', methods=["PUT"])
-def dislike(post_id: int):
-    # result, code = auth(request.headers)
-    # if code != 200:
-    #     result, code
-
-    # return post_service.dislike(post_id, result)
-    return "OK", 200
-
-
-@post_api.route('/favorite/<int:post_id>', methods=["PUT"])
-def favorite(post_id: int):
-    # result, code = auth(request.headers)
-    # if code != 200:
-    #     result, code
-
-    # return post_service.favorite(post_id, result)
-    return "OK", 200
-
-
-@post_api.route('/comment', methods=["POST"])
-def comment():
-    # result, code = auth(request.headers)
-    # if code != 200:
-    #     result, code
-
-    # data = request.get_json()
-    # return post_service.comment(data, result)
-    return "OK", 200
-
-
-@post_api.route('/<int:post_id>', methods=["DELETE"])
-def delete(post_id: int):
-    # result, code = auth(request.headers)
-    # if code != 200:
-    #     result, code
-
-    # return post_service.delete(post_id, result)
-    return "OK", 200
+class FavoriteResource(Resource):
+    def __init__(self):
+        # To be implemented.
+        pass
+ 
+    def get(self, post_id):
+        # To be implemented.
+        pass
+ 
+ 
+class CommentResource(Resource):
+    def __init__(self):
+        # To be implemented.
+        pass
+ 
+    def post(self, post_id):
+        # To be implemented.
+        pass
+ 
