@@ -5,12 +5,12 @@ from dataclasses import dataclass, asdict
 @dataclass
 class Block(db.Model):
     id: int
-    src_user_id: int
-    dst_user_id: int
+    src: int
+    dst: int
 
     id = db.Column(db.Integer, primary_key=True)
-    src_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    dst_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    src = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    dst = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 
     def get_dict(self):
@@ -18,7 +18,7 @@ class Block(db.Model):
 
 
     def __str__(self) -> str:
-        return f'Block: id={self.id}, src_user_id={self.src_user_id}, dst_user_id={self.dst_user_id}'
+        return f'Block: id={self.id}'
 
 
 @dataclass
@@ -64,12 +64,14 @@ class Favorite(db.Model):
 @dataclass
 class Follow(db.Model):
     id: int
-    src_user_id: int
-    dst_user_id: int
+    mute: bool
+    src: int
+    dst: int
 
     id = db.Column(db.Integer, primary_key=True)
-    src_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    dst_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    mute = db.Column(db.Boolean, nullable=False)
+    src = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    dst = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 
     def get_dict(self):
@@ -77,7 +79,7 @@ class Follow(db.Model):
 
 
     def __str__(self) -> str:
-        return f'Follow: id={self.id}, src_user_id={self.src_user_id}, dst_user_id={self.dst_user_id}'
+        return f'Follow: id={self.id}'
 
 
 @dataclass
