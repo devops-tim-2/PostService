@@ -1,0 +1,64 @@
+version: '3'
+networks:
+  apigateway_the_network:
+    external: true
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: 'python main.py'
+    ports:
+      - 8083:5000
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+    environment:
+      FLASK_ENV: development
+      FLASK_RUN_HOST: 0.0.0.0
+ 
+      DB_TYPE: postgresql
+      DB_DRIVER: psycopg2
+      DB_USER: test
+      DB_PASSWORD: test
+      DB_HOST: db
+      DB_NAME: main
+ 
+      TEST_DATABASE_URI: sqlite:///database.db
+ 
+      RABBITMQ_URI: amqps://qilglokd:nlmVctERVcA7th3VCE1-UL_uij-BCXyj@roedeer.rmq.cloudamqp.com/qilglokd
+ 
+      KEY: ${KEY}
+      JWT_ALGORITHM: ${JWT_ALGORITHM}
+      JWT_SECRET: ${JWT_SECRET}
+    hostname: postservice
+    networks:
+      - apigateway_the_network
+ 
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: 'python -u broker/consume.py'
+    depends_on:
+      - db
+    environment:
+      RABBITMQ_URI: amqps://qilglokd:nlmVctERVcA7th3VCE1-UL_uij-BCXyj@roedeer.rmq.cloudamqp.com/qilglokd
+    networks:
+      - apigateway_the_network
+ 
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: main
+    volumes:
+      - .dbdata:/var/lib/postgresql
+    ports:
+      - 54323:5432
+    networks:
+      - apigateway_the_network
