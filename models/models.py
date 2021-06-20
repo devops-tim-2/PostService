@@ -1,16 +1,21 @@
-from common.database import db
 from dataclasses import dataclass, asdict
 
+from sqlalchemy import Column, Integer, String, Boolean, \
+     ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
+
+Model = declarative_base(name='Model')
 
 @dataclass
-class Block(db.Model):
+class Block(Model):
+    __tablename__ = 'block'
     id: int
     src: int
     dst: int
 
-    id = db.Column(db.Integer, primary_key=True)
-    src = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    dst = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    id = Column(Integer, primary_key=True)
+    src = Column(Integer, ForeignKey('user.id'), nullable=False)
+    dst = Column(Integer, ForeignKey('user.id'), nullable=False)
 
 
     def get_dict(self):
@@ -22,16 +27,17 @@ class Block(db.Model):
 
 
 @dataclass
-class Comment(db.Model):
+class Comment(Model):
+    __tablename__ = 'comment'
     id: int
     text: str
     post_id: int
     user_id: int    
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    text = db.Column(db.String(300), nullable=False)
-    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    text = Column(String(300), nullable=False)
+    post_id = Column(Integer, ForeignKey('post.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
 
 
     def get_dict(self):
@@ -43,14 +49,15 @@ class Comment(db.Model):
 
 
 @dataclass
-class Favorite(db.Model):
+class Favorite(Model):
+    __tablename__ = 'favorite'
     id: int
     post_id: int
     user_id: int
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    post_id = Column(Integer, ForeignKey('post.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
 
 
     def get_dict(self):
@@ -62,16 +69,17 @@ class Favorite(db.Model):
 
 
 @dataclass
-class Follow(db.Model):
+class Follow(Model):
+    __tablename__ = 'follow'
     id: int
     mute: bool
     src: int
     dst: int
 
-    id = db.Column(db.Integer, primary_key=True)
-    mute = db.Column(db.Boolean, nullable=False)
-    src = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    dst = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    id = Column(Integer, primary_key=True)
+    mute = Column(Boolean, nullable=False)
+    src = Column(Integer, ForeignKey('user.id'), nullable=False)
+    dst = Column(Integer, ForeignKey('user.id'), nullable=False)
 
 
     def get_dict(self):
@@ -84,15 +92,16 @@ class Follow(db.Model):
 
 @dataclass
 class Like:
+    __tablename__ = 'like'
     id: int
     post_id: int
     user_id: int
     state: bool
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    state = db.Column(db.Boolean, nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    post_id = Column(Integer, ForeignKey('post.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    state = Column(Boolean, nullable=False)
 
     def get_dict(self):
         return asdict(self)
@@ -103,16 +112,17 @@ class Like:
 
 
 @dataclass
-class Post(db.Model):
+class Post(Model):
+    __tablename__ = 'post'
     id: int
     description: str
     image_url: str
     user_id: int
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    description = db.Column(db.String(100))
-    image_url = db.Column(db.String(100), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    description = Column(String(100))
+    image_url = Column(String(100), nullable=False)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
 
 
     def get_dict(self):
@@ -124,14 +134,15 @@ class Post(db.Model):
 
 
 @dataclass
-class Tagged(db.Model):
+class Tagged(Model):
+    __tablename__ = 'tagged'
     id: int
     post_id: int
     user_id: int
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    post_id = Column(Integer, ForeignKey('post.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
 
 
     def get_dict(self):
@@ -143,10 +154,11 @@ class Tagged(db.Model):
 
 
 @dataclass
-class User(db.Model):
+class User(Model):
+    __tablename__ = 'user'
     id: int
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
     
 
     def get_dict(self):

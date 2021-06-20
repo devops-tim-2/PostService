@@ -1,10 +1,7 @@
 import json
-
-import sqlalchemy
-from sqlalchemy.orm import sessionmaker, scoped_session
-from os import environ
-engine = sqlalchemy.create_engine(f'{environ.get("DB_TYPE")}+{environ.get("DB_DRIVER")}://{environ.get("DB_USER")}:{environ.get("DB_PASSWORD")}@{environ.get("DB_HOST")}/{environ.get("DB_NAME")}')
-Session = scoped_session(sessionmaker(bind=engine))
+from common.database import db_session
+from models.models import User, Follow, Block
+from service import post_service
 
 class UserConsumer:
     def __init__(self, channel):
@@ -17,20 +14,24 @@ class UserConsumer:
         data = json.loads(body)
 
         if properties.content_type == 'user.created':            
-            with engine.connect() as con:
-                con.execute(sqlalchemy.text('INSERT INTO public.user (id) VALUES (:val)'), val=data['id'])
+            user = User(id=data['id'])
+            db_session.add(user)
+            db_session.commit()
         elif properties.content_type == 'user.deleted':
-            with engine.connect() as con:
-                con.execute(sqlalchemy.text('DELETE FROM public.user WHERE id=:val'), val=data['id'])
+            User.query.get(data['id']).delete()
+            db_session.commit()
         elif properties.content_type == 'user.follow.created':
-            with engine.connect() as con:
-                con.execute(sqlalchemy.text('INSERT INTO public.follow (id, src, dst, mute) VALUES (:id, :src, :dst, :mute)'), id=data['id'], src=data['src'], dst=data['dst'], mute=data['mute'])
+            follow = Follow(id=data['id'], src=data['src'], dst=data['dst'], mute=data['mute'])
+            db_session.add(follow)
+            db_session.commit()
         elif properties.content_type == 'user.block.created':
-            with engine.connect() as con:
-                con.execute(sqlalchemy.text('INSERT INTO public.block (id, src, dst) VALUES (:id, :src, :dst)'), id=data['id'], src=data['src'], dst=data['dst'])
+            block = Block(id=data['id'], src=data['src'], dst=data['dst'])
+            db_session.add(block)
+            db_session.commit()
         elif properties.content_type == 'user.follow.updated':
-            with engine.connect() as con:
-                con.execute(sqlalchemy.text('UPLDATE public.follow SET mute=:mute WHERE id=:id'), id=data['id'], mute=data['mute'])
+            follow = Follow.query.get(data['id'])
+            follow.mute = data['mute']
+            db_session.commit()
 
 class AdminConsumer:
     def __init__(self, channel):
@@ -43,6 +44,4 @@ class AdminConsumer:
         data = json.loads(body)
 
         if properties.content_type == 'post.delete':
-            with engine.connect() as con:
-                con.execute(sqlalchemy.text('DELETE FROM public.post WHERE id=:val'), val=data['id'])
-
+            post_service.delete(data['id'])
