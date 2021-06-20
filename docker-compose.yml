@@ -50,6 +50,13 @@ services:
       DEV_DATABASE_URI: postgresql+psycopg2://test:test@post_db/main
       SQLALCHEMY_DATABASE_URI: postgresql+psycopg2://test:test@post_db/main
       RABBITMQ_URI: amqps://qilglokd:nlmVctERVcA7th3VCE1-UL_uij-BCXyj@roedeer.rmq.cloudamqp.com/qilglokd
+
+      DB_TYPE: postgresql
+      DB_DRIVER: psycopg2
+      DB_USER: test
+      DB_PASSWORD: test
+      DB_HOST: post_db
+      DB_NAME: main
     networks:
       - apigateway_the_network
  

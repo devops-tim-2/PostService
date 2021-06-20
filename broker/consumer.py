@@ -1,6 +1,6 @@
 import json
 from common.database import db_session
-from models.models import User, Follow, Block, Post
+from models.models import User, Follow, Block
 from service import post_service
 
 class UserConsumer:
