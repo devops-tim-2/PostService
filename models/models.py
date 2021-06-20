@@ -2,8 +2,9 @@ from dataclasses import dataclass, asdict
 
 from sqlalchemy import Column, Integer, String, Boolean, \
      ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
 
-from common.database import Model
+Model = declarative_base(name='Model')
 
 @dataclass
 class Block(Model):
