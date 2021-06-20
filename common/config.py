@@ -7,7 +7,7 @@ from flask_wtf import CSRFProtect
 from flask_restful import Api
 from common.database import db
 from models.models import Block, Comment, Favorite, Follow, Like, Post, Tagged, User
-from routes.post_routes import PostResource, PostListResource, ProfileResource, LikeResource, DislikeResource, FavoriteResource, CommentResource
+from controller.post_controller import PostResource, PostListResource, ProfileResource, LikeResource, DislikeResource, FavoriteResource, CommentResource
 
 
 DevConfig = {

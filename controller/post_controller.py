@@ -1,5 +1,5 @@
 from flask_restful import Resource, reqparse
- 
+
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('description', type=str, help='Description for post')
 post_parser.add_argument('image_url', type=str, help='Image url for post')
