@@ -1,3 +1,4 @@
+from exception.exceptions import InvalidAuthException, InvalidDataException
 from flask_restful import Resource, reqparse
 from common.utils import auth
 from service import post_service
@@ -34,11 +35,14 @@ class PostListResource(Resource):
         token = args['Authorization'].split(' ')[1]
         del args['Authorization']
 
-        auth_result = auth(token)
-        if type(auth_result) == tuple:
-            return auth_result
+        try:
+            user = auth(token)
 
-        return post_service.create(args, auth_result)
+            return post_service.create(args, user), 200
+        except InvalidAuthException as e:
+            return str(e), 401
+        except InvalidDataException as e:
+            return str(e), 400
  
 class ProfileResource(Resource):
     def __init__(self):

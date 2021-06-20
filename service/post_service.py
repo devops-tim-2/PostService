@@ -1,19 +1,20 @@
+from exception.exceptions import InvalidDataException
 from models.models import Post
 from common.utils import check
 from broker.producer import publish
 from repository import post_repository
 
-def create(post_data: dict, user: dict) -> Post:
+def create(post_data: dict, user: dict):
     if check(post_data):
-        return 'Some of the values are None, empty value or non-positive value', 400
+        raise InvalidDataException('Some of the values are None, empty value or non-positive value')
 
     post = Post(description=post_data['description'], image_url=post_data['image_url'], user_id=user['id'])
 
     post_repository.create(post)
-    publish('post.created', post)
-    publish('post.published', post)
+    publish('post.created', post.get_dict())
+    publish('post.published', post.get_dict())
 
-    return post.get_dict(), 200
+    return post.get_dict()
 
 def delete(id):
     post_repository.delete_by_id(id)

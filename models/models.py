@@ -91,7 +91,7 @@ class Follow(Model):
 
 
 @dataclass
-class Like:
+class Like(Model):
     __tablename__ = 'like'
     id: int
     post_id: int
