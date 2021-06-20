@@ -5,7 +5,7 @@ from flask.app import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
 from flask_restful import Api
-from common.database import db
+from common.database import init_db
 from models.models import Block, Comment, Favorite, Follow, Like, Post, Tagged, User
 from controller.post_controller import PostResource, PostListResource, ProfileResource, LikeResource, DislikeResource, FavoriteResource, CommentResource
 
@@ -38,7 +38,7 @@ config: dict = {
 }
 
 
-def setup_config(cfg_name: str) -> Tuple[Flask, SQLAlchemy]:
+def setup_config(cfg_name: str):
     app = Flask(__name__)
 
     if environ.get('ENABLE_CSRF') == 1:
@@ -65,10 +65,8 @@ def setup_config(cfg_name: str) -> Tuple[Flask, SQLAlchemy]:
         app.config[key] = cfg[key]
 
     app.app_context().push()
-    db.init_app(app)
-
-    with app.app_context():
-        db.create_all()
+    #db.init_app(app)
+    init_db()
 
     if cfg_name == 'test':
         Block.query.delete()
@@ -80,4 +78,4 @@ def setup_config(cfg_name: str) -> Tuple[Flask, SQLAlchemy]:
         Post.query.delete()
         User.query.delete()
 
-    return app, db
+    return app
