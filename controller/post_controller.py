@@ -1,6 +1,9 @@
 from flask_restful import Resource, reqparse
+from common.utils import auth
+from service import post_service
 
 post_parser = reqparse.RequestParser()
+post_parser.add_argument('Authorization', type=str, location='headers', required=True)
 post_parser.add_argument('description', type=str, help='Description for post')
 post_parser.add_argument('image_url', type=str, help='Image url for post')
  
@@ -27,8 +30,15 @@ class PostListResource(Resource):
         pass
  
     def post(self):
-        # To be implemented.
-        pass
+        args = post_parser.parse_args()
+        token = args['Authorization'].split(' ')[1]
+        del args['Authorization']
+
+        auth_result = auth(token)
+        if type(auth_result) == tuple:
+            return auth_result
+
+        return post_service.create(args, auth_result)
  
 class ProfileResource(Resource):
     def __init__(self):

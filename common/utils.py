@@ -8,11 +8,7 @@ def check(obj: dict) -> bool:
     return not obj or any(prop is None or ((type(prop) is list or type(prop) is str) and len(prop) == 0) or ((type(prop) is int or type(prop) is float) and prop < 1) for prop in list(obj.values()))
 
 
-def auth(headers: datastructures.Headers):
-    if not headers.has_key('Authorization'):
-        return 'Forbidden, unauthorized atempt.', 403
-
-    token = headers['Authorization'].split(' ')[1]
+def auth(token: str):
     try:
         payload = jwt.decode(token, environ.get('JWT_SECRET'), environ.get('JWT_ALGORITHM'))
     except:
