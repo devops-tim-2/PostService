@@ -11,3 +11,4 @@ db_session = scoped_session(sessionmaker(autocommit=False,
 def init_db():
     Model.query = db_session.query_property()
     Model.metadata.create_all(bind=engine)
+
