@@ -70,3 +70,45 @@ def test_get_not_found(mocker):
 
     with pytest.raises(NotFoundException) as e:
         post_service.get(1, user)
+
+
+def test_get_users_posts_ok(mocker):
+    profile_data = {
+        "id": 1,
+        "public": True
+    }
+
+    user_data = {
+        "id": 2
+    }
+
+    profile = User(**profile_data)
+    expected = [Post(id=1, description='post list description 1', image_url='post list image url 1', user_id=profile_data['id']), Post(id=2, description='post list description 2', image_url='post list image url 2', user_id=profile_data['id'])]
+
+    mocker.patch('service.post_service.user_service.get', return_value=profile)
+    mocker.patch('service.post_service.block_service.find', return_value=False)
+    mocker.patch('service.post_service.post_repository.get_users_posts', return_value=expected)
+
+    actual = post_service.get_users_posts(profile_data['id'], user_data)
+    expected = [post.get_dict() for post in expected]
+
+    assert expected==actual
+
+
+def test_get_users_posts_with_block(mocker):
+    profile_data = {
+        "id": 1,
+        "public": True
+    }
+
+    user_data = {
+        "id": 2
+    }
+
+    profile = User(**profile_data)
+    
+    mocker.patch('service.post_service.user_service.get', return_value=profile)
+    mocker.patch('service.post_service.block_service.find', return_value=True)
+    
+    with pytest.raises(NotFoundException) as e:
+        post_service.get_users_posts(profile_data['id'], user_data)

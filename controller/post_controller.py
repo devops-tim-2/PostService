@@ -1,4 +1,4 @@
-from exception.exceptions import InvalidAuthException, InvalidDataException, NotFoundException
+from exception.exceptions import InvalidAuthException, InvalidDataException, NotAccessibleException, NotFoundException
 from flask_restful import Resource, reqparse
 from flask import request
 from common.utils import auth
@@ -61,8 +61,20 @@ class ProfileResource(Resource):
         pass
  
     def get(self, user_id):
-        # To be implemented.
-        pass
+        try:
+            if not request.headers.has_key('Authorization'):
+                return post_service.get_users_posts(user_id, None), 200
+            else:
+                token = request.headers['Authorization'].split(' ')[1]
+                user = auth(token)
+
+                return post_service.get_users_posts(user_id, user), 200
+        except InvalidAuthException as e:
+            return str(e), 401
+        except NotFoundException as e:
+            return str(e), 404
+        except NotAccessibleException as e:
+            return str(e), 400
  
 class LikeResource(Resource):
     def __init__(self):
