@@ -2,7 +2,7 @@ from exception.exceptions import InvalidDataException, NotAccessibleException, N
 from models.models import Post
 from common.utils import check
 from broker.producer import publish
-from service import block_service, follow_service, user_service
+from service import block_service, follow_service, user_service, favorite_service, tagged_service, like_service, comment_service
 from repository import post_repository
 
 def create(post_data: dict, user: dict):
@@ -50,6 +50,20 @@ def get_users_posts(profile_id: int, user: dict):
 
     return [post.get_dict() for post in posts]
 
-def delete(id):
-    post_repository.delete_by_id(id)
-    publish('post.deleted', id)
+def delete(post_id: int, user: dict):
+    post = post_repository.get(post_id)
+
+    if not post:
+        raise NotFoundException(f'Post with id {post_id} not found.')
+    elif post.user_id != user['id']:
+        raise InvalidDataException(f'You can\'t delete someone else\'s post.')
+
+    favorite_service.delete_with_post(post_id)
+    tagged_service.delete_with_post(post_id)
+    like_service.delete_with_post(post_id)
+    comment_service.delete_with_post(post_id)
+
+    post_repository.delete(post_id)
+    publish('post.deleted', post_id)
+
+    return True
