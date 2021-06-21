@@ -1,10 +1,10 @@
 from os import environ
 environ['SQLALCHEMY_DATABASE_URI'] = environ.get("TEST_DATABASE_URI")
 
-from models.models import Post, User
+from models.models import Block, Post, User
 from common.config import setup_config
 from common.utils import generate_token
-import json
+import json, pytest
 
 
 class TestPost:
@@ -13,21 +13,58 @@ class TestPost:
         cls.app = setup_config('test')
         from common.database import db_session
 
-        cls.user = User(public=True)
-        db_session.add(cls.user)
+        cls.user1 = User(public=True)
+        db_session.add(cls.user1)
         db_session.commit()
 
-        cls.user_data = dict(id=cls.user.id, username="milos", password="milos", role="user", age=18, sex="m", region="srb", interests="sport", bio="some bio", website="https://milos.com", phone="some phone", mail="milos@mail.com", profile_image_link="https://milos.com/profile.jpg", public=cls.user.public, taggable=True)
-        
-        cls.token = generate_token(cls.user.get_dict())
+        cls.user2 = User(public=True)
+        db_session.add(cls.user2)
+        db_session.commit()
 
-        cls.post = Post(description='some nice description3', image_url='some nice image_url3', user_id=cls.user.id)
-        db_session.add(cls.post)
+        block = Block(src=cls.user1.id, dst=cls.user2.id)
+        db_session.add(block)
+        db_session.commit()
+
+        user1_data = dict(id=cls.user1.id, username="milos", password="milos", role="user", age=18, sex="m", region="srb", interests="sport", bio="some bio", website="https://milos.com", phone="some phone", mail="milos@mail.com", profile_image_link="https://milos.com/profile.jpg", public=cls.user1.public, taggable=True)
+
+        cls.token = generate_token(user1_data)
+
+        cls.post1 = Post(description='some nice description3', image_url='some nice image_url3', user_id=cls.user1.id)
+        db_session.add(cls.post1)
+        db_session.commit()
+
+        cls.post2 = Post(description='some nice description4', image_url='some nice image_url4', user_id=cls.user1.id)
+        db_session.add(cls.post2)
         db_session.commit()
 
         cls.client = cls.app.test_client()
 
 
+    @pytest.mark.run(order=1)
+    def test_get_happy(cls):
+        get_response = cls.client.get(f'/api/{cls.post1.id}', headers={'Authorization': f'Bearer {cls.token}', 'Content-Type': 'application/json'}).get_json()
+        assert get_response['id'] == cls.post1.id
+
+
+    @pytest.mark.run(order=2)
+    def test_get_sad(cls):
+        get_response = cls.client.get(f'/api/{-1}', headers={'Authorization': f'Bearer {cls.token}', 'Content-Type': 'application/json'})
+        assert get_response.status_code == 404
+
+
+    @pytest.mark.run(order=3)
+    def test_get_users_posts_happy(cls):
+        get_response = cls.client.get(f'/api/profile/{cls.user1.id}', headers={'Authorization': f'Bearer {cls.token}', 'Content-Type': 'application/json'}).get_json()
+        assert len(get_response) == 2
+
+
+    @pytest.mark.run(order=4)
+    def test_get_users_posts_sad(cls):
+        get_response = cls.client.get(f'/api/profile/{cls.user2.id}', headers={'Authorization': f'Bearer {cls.token}', 'Content-Type': 'application/json'})
+        assert get_response.status_code == 404
+
+
+    @pytest.mark.run(order=5)
     def test_create_happy(cls):
         post_count_before = Post.query.count()
 
@@ -40,9 +77,10 @@ class TestPost:
         assert post_count_after == post_count_before + 1
         assert post_db.description == post_data['description']
         assert post_db.image_url == post_data['image_url']
-        assert post_db.user_id == cls.user.id
+        assert post_db.user_id == cls.user1.id
 
 
+    @pytest.mark.run(order=6)
     def test_create_sad(cls):
         post_count_before = Post.query.count()
 
@@ -52,13 +90,3 @@ class TestPost:
         post_count_after = Post.query.count()
 
         assert post_count_after == post_count_before
-
-
-    def test_get_happy(cls):
-        get_response = cls.client.get(f'/api/{cls.post.id}', headers={'Authorization': f'Bearer {cls.token}', 'Content-Type': 'application/json'}).get_json()
-        assert get_response['id'] == cls.post.id
-
-
-    def test_get_sad(cls):
-        get_response = cls.client.get(f'/api/{-1}', headers={'Authorization': f'Bearer {cls.token}', 'Content-Type': 'application/json'})
-        assert get_response.status_code == 404

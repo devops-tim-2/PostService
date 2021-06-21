@@ -9,3 +9,7 @@ class InvalidAuthException(Exception):
 class NotFoundException(Exception):
     def __init__(self, message="Entity not found"):
         super().__init__(message)
+
+class NotAccessibleException(Exception):
+    def __init__(self, message="Entity is private"):
+        super().__init__(message)
