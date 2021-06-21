@@ -90,13 +90,3 @@ class TestPost:
         post_count_after = Post.query.count()
 
         assert post_count_after == post_count_before
-
-
-    def test_get_happy(cls):
-        get_response = cls.client.get(f'/api/{cls.post.id}', headers={'Authorization': f'Bearer {cls.token}', 'Content-Type': 'application/json'}).get_json()
-        assert get_response['id'] == cls.post.id
-
-
-    def test_get_sad(cls):
-        get_response = cls.client.get(f'/api/{-1}', headers={'Authorization': f'Bearer {cls.token}', 'Content-Type': 'application/json'})
-        assert get_response.status_code == 404
