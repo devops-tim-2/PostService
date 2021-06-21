@@ -14,8 +14,8 @@ class Block(Model):
     dst: int
 
     id = Column(Integer, primary_key=True)
-    src = Column(Integer, ForeignKey('user.id'), nullable=False)
-    dst = Column(Integer, ForeignKey('user.id'), nullable=False)
+    src = Column(Integer, ForeignKey('user_profile.id'), nullable=False)
+    dst = Column(Integer, ForeignKey('user_profile.id'), nullable=False)
 
 
     def get_dict(self):
@@ -37,7 +37,7 @@ class Comment(Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     text = Column(String(300), nullable=False)
     post_id = Column(Integer, ForeignKey('post.id'), nullable=False)
-    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('user_profile.id'), nullable=False)
 
 
     def get_dict(self):
@@ -57,7 +57,7 @@ class Favorite(Model):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     post_id = Column(Integer, ForeignKey('post.id'), nullable=False)
-    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('user_profile.id'), nullable=False)
 
 
     def get_dict(self):
@@ -78,8 +78,8 @@ class Follow(Model):
 
     id = Column(Integer, primary_key=True)
     mute = Column(Boolean, nullable=False)
-    src = Column(Integer, ForeignKey('user.id'), nullable=False)
-    dst = Column(Integer, ForeignKey('user.id'), nullable=False)
+    src = Column(Integer, ForeignKey('user_profile.id'), nullable=False)
+    dst = Column(Integer, ForeignKey('user_profile.id'), nullable=False)
 
 
     def get_dict(self):
@@ -100,7 +100,7 @@ class Like(Model):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     post_id = Column(Integer, ForeignKey('post.id'), nullable=False)
-    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('user_profile.id'), nullable=False)
     state = Column(Boolean, nullable=False)
 
     def get_dict(self):
@@ -122,7 +122,7 @@ class Post(Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     description = Column(String(100))
     image_url = Column(String(100), nullable=False)
-    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('user_profile.id'), nullable=False)
 
 
     def get_dict(self):
@@ -142,7 +142,7 @@ class Tagged(Model):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     post_id = Column(Integer, ForeignKey('post.id'), nullable=False)
-    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('user_profile.id'), nullable=False)
 
 
     def get_dict(self):
@@ -155,7 +155,7 @@ class Tagged(Model):
 
 @dataclass
 class User(Model):
-    __tablename__ = 'user'
+    __tablename__ = 'user_profile'
     id: int
     public: bool
 
