@@ -157,8 +157,10 @@ class Tagged(Model):
 class User(Model):
     __tablename__ = 'user'
     id: int
+    public: bool
 
     id = Column(Integer, primary_key=True)
+    public = Column(Boolean, nullable=False)
     
 
     def get_dict(self):
@@ -166,4 +168,4 @@ class User(Model):
 
 
     def __str__(self) -> str:
-        return f'User: id={self.id}'
+        return f'User: id={self.id}, public={self.public}'

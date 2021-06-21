@@ -1,5 +1,6 @@
-from exception.exceptions import InvalidAuthException, InvalidDataException
+from exception.exceptions import InvalidAuthException, InvalidDataException, NotFoundException
 from flask_restful import Resource, reqparse
+from flask import request
 from common.utils import auth
 from service import post_service
 
@@ -17,9 +18,19 @@ class PostResource(Resource):
         # To be implemented.
         pass
  
-    def get(self, post_id):
-        # To be implemented.
-        pass
+    def get(self, post_id):        
+        try:
+            if not request.headers.has_key('Authorization'):
+                return post_service.get(post_id, None), 200
+            else:
+                token = request.headers['Authorization'].split(' ')[1]
+                user = auth(token)
+
+                return post_service.get(post_id, user), 200
+        except InvalidAuthException as e:
+            return str(e), 401
+        except NotFoundException as e:
+            return str(e), 404
 
     def delete(self, post_id):
         # To be implemented.

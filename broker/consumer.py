@@ -14,12 +14,17 @@ class UserConsumer:
         data = json.loads(body)
 
         if properties.content_type == 'user.created':            
-            user = User(id=data['id'])
+            user = User(id=data['id'], public=data['public'])
             db_session.add(user)
             db_session.commit()
         elif properties.content_type == 'user.deleted':
             User.query.get(data['id']).delete()
             db_session.commit()
+        elif properties.content_type == 'user.updated':
+            user = User.query.get(data['id'])
+            if user.public != data['public']:
+                user.public = data['public']
+                db_session.commit()
         elif properties.content_type == 'user.follow.created':
             follow = Follow(id=data['id'], src=data['src'], dst=data['dst'], mute=data['mute'])
             db_session.add(follow)
