@@ -33,8 +33,20 @@ class PostResource(Resource):
             return str(e), 404
 
     def delete(self, post_id):
-        # To be implemented.
-        pass
+        try:
+            if not request.headers.has_key('Authorization'):
+                return 'Forbidden, unauthorized atempt.', 403
+            else:
+                token = request.headers['Authorization'].split(' ')[1]
+                user = auth(token)
+
+                return post_service.delete(post_id, user), 200
+        except InvalidAuthException as e:
+            return str(e), 401
+        except NotFoundException as e:
+            return str(e), 404
+        except InvalidDataException as e:
+            return str(e), 400
  
 class PostListResource(Resource):
     def __init__(self):

@@ -11,6 +11,6 @@ def get(post_id: int) -> Post:
 def get_users_posts(user_id: int):
     return Post.query.filter_by(user_id=user_id).all()
 
-def delete_by_id(id):
-    Post.query.filter_by(id=id).delete()
+def delete(post_id: int):
+    Post.query.filter_by(id=post_id).delete()
     db_session.commit()
