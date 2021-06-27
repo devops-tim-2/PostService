@@ -12,7 +12,7 @@ def check(obj: dict) -> bool:
 def auth(token: str):
     try:
         payload = jwt.decode(token, environ.get('JWT_SECRET'), environ.get('JWT_ALGORITHM'))
-    except:
+    except Exception:
         raise InvalidAuthException('Forbidden, invalid authentication.')
 
     exp = payload['exp']

@@ -28,9 +28,8 @@ def get(post_id: int, user: dict):
     if user and owner.id == user['id']:
         return post.get_dict()
 
-    if not owner.public:
-        if not user or not follow_service.find(user['id'], post.user_id):
-            raise NotFoundException(f'Post with id {post_id} not found.')
+    if not owner.public and (not user or not follow_service.find(user['id'], post.user_id)):
+        raise NotFoundException(f'Post with id {post_id} not found.')
 
     return post.get_dict()
 
@@ -45,9 +44,8 @@ def get_users_posts(profile_id: int, user: dict):
     if user and profile.id == user['id']:
         return [post.get_dict() for post in posts]
 
-    if not profile.public:
-        if not user or not follow_service.find(user['id'], profile_id):
-            raise NotAccessibleException(f'Profile with id {profile_id} is private.')
+    if not profile.public and (not user or not follow_service.find(user['id'], profile_id)):
+        raise NotAccessibleException(f'Profile with id {profile_id} is private.')
 
     return [post.get_dict() for post in posts]
 
