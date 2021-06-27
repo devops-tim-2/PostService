@@ -67,3 +67,7 @@ def delete(post_id: int, user: dict):
     publish('post.deleted', post_id)
 
     return True
+
+def get_all():
+    posts = post_repository.get_all()
+    return [post.get_dict() for post in posts]
