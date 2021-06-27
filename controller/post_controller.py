@@ -53,6 +53,9 @@ class PostListResource(Resource):
         # To be implemented.
         pass
  
+    def get(self):
+        return post_service.get_all()
+        
     def post(self):
         args = post_parser.parse_args()
         token = args['Authorization'].split(' ')[1]
