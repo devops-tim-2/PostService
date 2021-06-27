@@ -46,7 +46,8 @@ def get_users_posts(profile_id: int, user: dict):
         return [post.get_dict() for post in posts]
 
     if not profile.public:
-        raise NotAccessibleException(f'Profile with id {profile_id} is private.')
+        if not user or not follow_service.find(user['id'], profile_id):
+            raise NotAccessibleException(f'Profile with id {profile_id} is private.')
 
     return [post.get_dict() for post in posts]
 
