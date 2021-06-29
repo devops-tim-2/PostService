@@ -2,7 +2,7 @@ from exception.exceptions import InvalidAuthException, InvalidDataException, Not
 from flask_restful import Resource, reqparse
 from flask import request
 from common.utils import auth
-from service import post_service
+from service import post_service, favorite_service
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('Authorization', type=str, location='headers', required=True)
@@ -115,8 +115,18 @@ class FavoriteResource(Resource):
         pass
  
     def get(self, post_id):
-        # To be implemented.
-        pass
+        try:
+            if not request.headers.has_key('Authorization'):
+                return 'Forbidden, unauthorized atempt.', 403
+            else:
+                token = request.headers['Authorization'].split(' ')[1]
+                user = auth(token)
+
+                return favorite_service.favorite(post_id, user), 200
+        except InvalidAuthException as e:
+            return str(e), 401
+        except NotFoundException as e:
+            return str(e), 404
  
  
 class CommentResource(Resource):
