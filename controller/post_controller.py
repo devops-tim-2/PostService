@@ -2,7 +2,7 @@ from exception.exceptions import InvalidAuthException, InvalidDataException, Not
 from flask_restful import Resource, reqparse
 from flask import request
 from common.utils import auth
-from service import post_service, favorite_service
+from service import post_service, like_service, favorite_service
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('Authorization', type=str, location='headers', required=True)
@@ -97,8 +97,18 @@ class LikeResource(Resource):
         pass
  
     def get(self, post_id):
-        # To be implemented.
-        pass
+        try:
+            if not request.headers.has_key('Authorization'):
+                return 'Forbidden, unauthorized atempt.', 403
+            else:
+                token = request.headers['Authorization'].split(' ')[1]
+                user = auth(token)
+
+                return like_service.like(post_id, user), 200
+        except InvalidAuthException as e:
+            return str(e), 401
+        except NotFoundException as e:
+            return str(e), 404
 
 class DislikeResource(Resource):
     def __init__(self):
@@ -106,8 +116,18 @@ class DislikeResource(Resource):
         pass
  
     def get(self, post_id):
-        # To be implemented.
-        pass
+        try:
+            if not request.headers.has_key('Authorization'):
+                return 'Forbidden, unauthorized atempt.', 403
+            else:
+                token = request.headers['Authorization'].split(' ')[1]
+                user = auth(token)
+
+                return like_service.dislike(post_id, user), 200
+        except InvalidAuthException as e:
+            return str(e), 401
+        except NotFoundException as e:
+            return str(e), 404
 
 class FavoriteResource(Resource):
     def __init__(self):
