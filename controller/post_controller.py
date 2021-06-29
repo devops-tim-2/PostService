@@ -2,7 +2,7 @@ from exception.exceptions import InvalidAuthException, InvalidDataException, Not
 from flask_restful import Resource, reqparse
 from flask import request
 from common.utils import auth
-from service import post_service, like_service, favorite_service
+from service import post_service, like_service, favorite_service, comment_service
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('Authorization', type=str, location='headers', required=True)
@@ -10,6 +10,7 @@ post_parser.add_argument('description', type=str, help='Description for post')
 post_parser.add_argument('image_url', type=str, help='Image url for post')
  
 comment_parser = reqparse.RequestParser()
+comment_parser.add_argument('Authorization', type=str, location='headers', required=True)
 comment_parser.add_argument('text', type=str, help='Text of the comment')
 
  
@@ -155,6 +156,18 @@ class CommentResource(Resource):
         pass
  
     def post(self, post_id):
-        # To be implemented.
-        pass
+        args = comment_parser.parse_args()
+        token = args['Authorization'].split(' ')[1]
+        del args['Authorization']
+
+        try:
+            user = auth(token)
+
+            return comment_service.comment(post_id, args, user), 200
+        except InvalidAuthException as e:
+            return str(e), 401
+        except (InvalidDataException, NotAccessibleException) as e:
+            return str(e), 400
+        except NotFoundException as e:
+            return str(e), 404
  
