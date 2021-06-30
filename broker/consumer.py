@@ -19,6 +19,10 @@ class UserConsumer:
             db_session.commit()
         elif properties.content_type == 'user.deleted':
             User.query.get(data['id']).delete()
+            Follow.query.filter(Follow.src == data['id']).delete()
+            Follow.query.filter(Follow.dst == data['id']).delete()
+            Block.query.filter(Block.src == data['id']).delete()
+            Block.query.filter(Block.dst == data['id']).delete()
             db_session.commit()
         elif properties.content_type == 'user.updated':
             user = User.query.get(data['id'])
