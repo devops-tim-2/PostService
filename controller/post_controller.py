@@ -41,7 +41,10 @@ class PostResource(Resource):
                 token = request.headers['Authorization'].split(' ')[1]
                 user = auth(token)
 
-                return post_service.delete(post_id, user), 200
+                if post_service.get(post_id, user)['user_id'] != user['id']:
+                    return 'You can\'t delete someone else\'s post.', 401
+
+                return post_service.delete(post_id), 200
         except InvalidAuthException as e:
             return str(e), 401
         except NotFoundException as e:

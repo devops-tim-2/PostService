@@ -101,4 +101,4 @@ class TestPost:
     def test_delete_sad(cls):
         delete_response = cls.client.delete(f'/api/{cls.post1.id}', headers={'Authorization': f'Bearer {cls.token_user2}', 'Content-Type': 'application/json'})
         
-        assert delete_response.status_code == 400
+        assert delete_response.status_code == 404
