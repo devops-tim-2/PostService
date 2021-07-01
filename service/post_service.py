@@ -49,13 +49,11 @@ def get_users_posts(profile_id: int, user: dict):
 
     return [post.get_dict() for post in posts]
 
-def delete(post_id: int, user: dict):
+def delete(post_id: int):
     post = post_repository.get(post_id)
 
     if not post:
         raise NotFoundException(f'Post with id {post_id} not found.')
-    elif post.user_id != user['id']:
-        raise InvalidDataException(f'You can\'t delete someone else\'s post.')
 
     favorite_service.delete_with_post(post_id)
     tagged_service.delete_with_post(post_id)
