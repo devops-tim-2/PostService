@@ -45,7 +45,8 @@ class UserConsumer:
                 follow = Follow.query.get(data['id'])
                 follow.mute = data['mute']
                 db_session.commit()
-        except:
+        except Exception:
+            # don't crash
             pass
 
 class AdminConsumer:
@@ -61,5 +62,6 @@ class AdminConsumer:
 
             if properties.content_type == 'post.delete':
                 post_service.delete(data['id'])
-        except:
+        except Exception:
+            # don't crash
             pass
