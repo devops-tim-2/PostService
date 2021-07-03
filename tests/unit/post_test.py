@@ -58,7 +58,9 @@ def test_get_ok(mocker):
 
     actual = post_service.get(data['id'], user_data)
 
-    assert expected.get_dict()==actual
+    
+    for i in expected.get_dict():
+        assert expected.get_dict()[i] == actual[i]
 
 
 def test_get_not_found(mocker):

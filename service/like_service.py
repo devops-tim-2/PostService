@@ -2,6 +2,13 @@ from models.models import Like
 from repository import like_repository
 from service import post_service
 
+def count_likes(post_id):
+    return like_repository.count_likes(post_id)
+
+def count_dislikes(post_id):
+    return like_repository.count_dislikes(post_id)
+    
+
 def delete_with_post(post_id: int):
     like_repository.delete_with_post(post_id)
 
