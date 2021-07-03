@@ -33,13 +33,14 @@ def get(post_id: int, user: dict):
 
     return post.get_dict()
 
-def get_users_posts(profile_id: int, user: dict):
+def get_users_posts(profile_id: int, user: dict, page: int, per_page: int):
     profile = user_service.get(profile_id)
 
     if not profile or (user and block_service.find(user['id'], profile_id)):
         raise NotFoundException(f'Profile with id {profile_id} not found.')
 
     posts = post_repository.get_users_posts(profile_id)
+    posts = posts[(page-1)*per_page : page*per_page]
 
     if user and profile.id == user['id']:
         return [post.get_dict() for post in posts]
@@ -65,6 +66,6 @@ def delete(post_id: int):
 
     return True
 
-def get_all():
+def get_all(page: int, per_page: int):
     posts = post_repository.get_all()
-    return [post.get_dict() for post in posts]
+    return [post.get_dict() for post in posts][(page-1)*per_page : page*per_page]

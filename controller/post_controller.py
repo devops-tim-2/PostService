@@ -58,7 +58,10 @@ class PostListResource(Resource):
         pass
  
     def get(self):
-        return post_service.get_all()
+        page = int(request.args.get('page')) if request.args.get('page') else 1
+        per_page = int(request.args.get('per_page')) if request.args.get('per_page') else 10
+
+        return post_service.get_all(page, per_page)
         
     def post(self):
         args = post_parser.parse_args()
@@ -80,14 +83,17 @@ class ProfileResource(Resource):
         pass
  
     def get(self, user_id):
+        page = int(request.args.get('page')) if request.args.get('page') else 1
+        per_page = int(request.args.get('per_page')) if request.args.get('per_page') else 10
+
         try:
             if not request.headers.has_key('Authorization'):
-                return post_service.get_users_posts(user_id, None), 200
+                return post_service.get_users_posts(user_id, None, page, per_page), 200
             else:
                 token = request.headers['Authorization'].split(' ')[1]
                 user = auth(token)
 
-                return post_service.get_users_posts(user_id, user), 200
+                return post_service.get_users_posts(user_id, user, page, per_page), 200
         except InvalidAuthException as e:
             return str(e), 401
         except NotFoundException as e:
