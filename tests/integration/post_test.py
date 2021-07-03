@@ -53,8 +53,8 @@ class TestPost:
 
 
     def test_get_users_posts_happy(cls):
-        get_response = cls.client.get(f'/api/profile/{cls.user1.id}', headers={'Authorization': f'Bearer {cls.token_user1}', 'Content-Type': 'application/json'}).get_json()
-        assert len(get_response) == 2
+        get_response = cls.client.get(f'/api/profile/{cls.user1.id}?page=1&per_page=1', headers={'Authorization': f'Bearer {cls.token_user1}', 'Content-Type': 'application/json'}).get_json()
+        assert len(get_response) == 1
 
 
     def test_get_users_posts_sad(cls):
