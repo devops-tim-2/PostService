@@ -33,10 +33,7 @@ def get(post_id: int, user: dict):
     post_dict['dislikes'] = like_service.count_dislikes(post_id)
 
 
-    if user and owner.id == user['id']:
-        return post_dict
-
-    if not owner.public and (not user or not follow_service.find(user['id'], post.user_id)):
+    if (not(user and owner.id == user['id'])) and not owner.public and (not user or not follow_service.find(user['id'], post.user_id)):
         raise NotFoundException(f'Post with id {post_id} not found.')
 
     return post_dict
