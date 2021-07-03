@@ -23,15 +23,20 @@ def get(post_id: int, user: dict):
     if not post or (user and block_service.find(user['id'], post.user_id)):
         raise NotFoundException(f'Post with id {post_id} not found.')
 
+
+    post_dict = post.get_dict()
+
     owner = user_service.get(post.user_id)
 
-    if user and owner.id == user['id']:
-        return post.get_dict()
+    post_dict['comments'] = [i.get_dict() for i in comment_service.get_for_post(post_id)]
+    post_dict['likes'] = like_service.count_likes(post_id)
+    post_dict['dislikes'] = like_service.count_dislikes(post_id)
 
-    if not owner.public and (not user or not follow_service.find(user['id'], post.user_id)):
+
+    if (not(user and owner.id == user['id'])) and not owner.public and (not user or not follow_service.find(user['id'], post.user_id)):
         raise NotFoundException(f'Post with id {post_id} not found.')
 
-    return post.get_dict()
+    return post_dict
 
 def get_users_posts(profile_id: int, user: dict):
     profile = user_service.get(profile_id)

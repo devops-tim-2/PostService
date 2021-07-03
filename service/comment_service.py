@@ -2,6 +2,9 @@ from models.models import Comment
 from repository import comment_repository
 from service import post_service
 
+def get_for_post(post_id):
+    return comment_repository.get_for_post(post_id)
+
 def delete_with_post(post_id: int):
     comment_repository.delete_with_post(post_id)
 
