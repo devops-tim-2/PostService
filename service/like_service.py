@@ -8,6 +8,11 @@ def count_likes(post_id):
 def count_dislikes(post_id):
     return like_repository.count_dislikes(post_id)
     
+def did_i_like(post_id, user):
+    return like_repository.like_exists(post_id, user['id'])
+
+def did_i_dislike(post_id, user):
+    return like_repository.dislike_exists(post_id, user['id'])
 
 def delete_with_post(post_id: int):
     like_repository.delete_with_post(post_id)

@@ -18,3 +18,10 @@ def favorite(post_id: int, user: dict):
         favorite_repository.save(favorite)
 
     return True
+
+
+def did_i_favorite(post_id, user):
+    return favorite_repository.favorite_exists(post_id, user['id'])
+
+def get_all(user):
+    return [i.get_dict() for i in favorite_repository.get_all(user['id'])]

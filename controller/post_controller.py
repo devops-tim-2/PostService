@@ -158,6 +158,24 @@ class FavoriteResource(Resource):
         except NotFoundException as e:
             return str(e), 404
  
+class FavoriteListResource(Resource):
+    def __init__(self):
+        # To be implemented.
+        pass
+ 
+    def get(self):
+        try:
+            if not request.headers.has_key('Authorization'):
+                return 'Forbidden, unauthorized atempt.', 403
+            else:
+                token = request.headers['Authorization'].split(' ')[1]
+                user = auth(token)
+
+                return favorite_service.get_all(user), 200
+        except InvalidAuthException as e:
+            return str(e), 401
+        except NotFoundException as e:
+            return str(e), 404
  
 class CommentResource(Resource):
     def __init__(self):

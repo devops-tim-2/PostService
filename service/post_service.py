@@ -31,6 +31,9 @@ def get(post_id: int, user: dict):
     post_dict['comments'] = [i.get_dict() for i in comment_service.get_for_post(post_id)]
     post_dict['likes'] = like_service.count_likes(post_id)
     post_dict['dislikes'] = like_service.count_dislikes(post_id)
+    post_dict['liked'] = like_service.did_i_like(post_id, user)
+    post_dict['disliked'] = like_service.did_i_dislike(post_id, user)
+    post_dict['favorited'] = favorite_service.did_i_favorite(post_id, user)
 
 
     if (not(user and owner.id == user['id'])) and not owner.public and (not user or not follow_service.find(user['id'], post.user_id)):
@@ -47,13 +50,14 @@ def get_users_posts(profile_id: int, user: dict, page: int, per_page: int):
     posts = post_repository.get_users_posts(profile_id)
     posts = posts[(page-1)*per_page : page*per_page]
 
-    if user and profile.id == user['id']:
-        return [post.get_dict() for post in posts]
-
-    if not profile.public and (not user or not follow_service.find(user['id'], profile_id)):
+    if (not(user and profile.id == user['id'])) and not profile.public and (not user or not follow_service.find(user['id'], profile_id)):
         raise NotAccessibleException(f'Profile with id {profile_id} is private.')
 
-    return [post.get_dict() for post in posts]
+    post_dicts = [post.get_dict() for post in posts]
+    for post_dict in post_dicts:
+        post_dict['comments'] = len(comment_service.get_for_post(post_dict['id']))
+        post_dict['likes'] = like_service.count_likes(post_dict['id']) - like_service.count_dislikes(post_dict['id'])
+    return post_dicts
 
 def delete(post_id: int):
     post = post_repository.get(post_id)
