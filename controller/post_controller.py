@@ -197,4 +197,23 @@ class CommentResource(Resource):
             return str(e), 400
         except NotFoundException as e:
             return str(e), 404
+
+class InappropriatePostResource(Resource):
+    def __init__(self):
+        # To be implemented.
+        pass
+
+    def get(self, post_id):
+        try:
+            if not request.headers.has_key('Authorization'):
+                return 'Forbidden, unauthorized atempt.', 403
+            else:
+                token = request.headers['Authorization'].split(' ')[1]
+                user = auth(token)
+
+                return post_service.inappropriate(post_id, user), 200
+        except InvalidAuthException as e:
+            return str(e), 401
+        except NotFoundException as e:
+            return str(e), 404
  

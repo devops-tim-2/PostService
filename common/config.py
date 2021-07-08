@@ -30,7 +30,7 @@ def setup_config(cfg_name: str):
 
     
     # This import must be postponed after init_db has been called
-    from controller.post_controller import PostResource, PostListResource, ProfileResource, LikeResource, DislikeResource, FavoriteResource, CommentResource, FavoriteListResource
+    from controller.post_controller import PostResource, PostListResource, ProfileResource, LikeResource, DislikeResource, FavoriteResource, CommentResource, FavoriteListResource, InappropriatePostResource
     api.add_resource(PostResource, '/api/<post_id>')
     api.add_resource(PostListResource, '/api')
     api.add_resource(ProfileResource, '/api/profile/<user_id>')
@@ -39,6 +39,7 @@ def setup_config(cfg_name: str):
     api.add_resource(FavoriteResource, '/api/favorite/<post_id>')
     api.add_resource(FavoriteListResource, '/api/favorite')
     api.add_resource(CommentResource, '/api/comment/<post_id>')
+    api.add_resource(InappropriatePostResource, '/api/inappropriate/<post_id>')
 
 
     # This import must be postponed after init_db has been called
