@@ -78,3 +78,15 @@ def delete(post_id: int):
 def get_all(page: int, per_page: int):
     posts = post_repository.get_all()
     return [post.get_dict() for post in posts][(page-1)*per_page : page*per_page]
+
+def inappropriate(post_id: int, user: dict):
+    post = get(post_id, user)
+
+    data = {
+        'description': post['description'],
+        'image_url': post['image_url'],
+        'post_id': post['id'],
+        'reporter_id': user['id']
+    }
+
+    publish('post.inappropriate', data)
