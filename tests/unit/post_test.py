@@ -58,7 +58,9 @@ def test_get_ok(mocker):
 
     actual = post_service.get(data['id'], user_data)
 
-    assert expected.get_dict()==actual
+    
+    for i in expected.get_dict():
+        assert expected.get_dict()[i] == actual[i]
 
 
 def test_get_not_found(mocker):
@@ -89,10 +91,11 @@ def test_get_users_posts_ok(mocker):
     mocker.patch('service.post_service.block_service.find', return_value=False)
     mocker.patch('service.post_service.post_repository.get_users_posts', return_value=expected)
 
-    actual = post_service.get_users_posts(profile_data['id'], user_data)
+    actual = post_service.get_users_posts(profile_data['id'], user_data, 1, 10)
     expected = [post.get_dict() for post in expected]
 
-    assert expected==actual
+    assert len(actual) == len(expected)
+
 
 
 def test_get_users_posts_with_block(mocker):
@@ -111,4 +114,4 @@ def test_get_users_posts_with_block(mocker):
     mocker.patch('service.post_service.block_service.find', return_value=True)
     
     with pytest.raises(NotFoundException) as e:
-        post_service.get_users_posts(profile_data['id'], user_data)
+        post_service.get_users_posts(profile_data['id'], user_data, 1, 10)

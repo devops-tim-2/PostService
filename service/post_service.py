@@ -23,39 +23,47 @@ def get(post_id: int, user: dict):
     if not post or (user and block_service.find(user['id'], post.user_id)):
         raise NotFoundException(f'Post with id {post_id} not found.')
 
+
+    post_dict = post.get_dict()
+
     owner = user_service.get(post.user_id)
 
-    if user and owner.id == user['id']:
-        return post.get_dict()
+    post_dict['comments'] = [i.get_dict() for i in comment_service.get_for_post(post_id)]
+    post_dict['likes'] = like_service.count_likes(post_id)
+    post_dict['dislikes'] = like_service.count_dislikes(post_id)
+    post_dict['liked'] = like_service.did_i_like(post_id, user)
+    post_dict['disliked'] = like_service.did_i_dislike(post_id, user)
+    post_dict['favorited'] = favorite_service.did_i_favorite(post_id, user)
 
-    if not owner.public and (not user or not follow_service.find(user['id'], post.user_id)):
+
+    if (not(user and owner.id == user['id'])) and not owner.public and (not user or not follow_service.find(user['id'], post.user_id)):
         raise NotFoundException(f'Post with id {post_id} not found.')
 
-    return post.get_dict()
+    return post_dict
 
-def get_users_posts(profile_id: int, user: dict):
+def get_users_posts(profile_id: int, user: dict, page: int, per_page: int):
     profile = user_service.get(profile_id)
 
     if not profile or (user and block_service.find(user['id'], profile_id)):
         raise NotFoundException(f'Profile with id {profile_id} not found.')
 
     posts = post_repository.get_users_posts(profile_id)
+    posts = posts[(page-1)*per_page : page*per_page]
 
-    if user and profile.id == user['id']:
-        return [post.get_dict() for post in posts]
-
-    if not profile.public and (not user or not follow_service.find(user['id'], profile_id)):
+    if (not(user and profile.id == user['id'])) and not profile.public and (not user or not follow_service.find(user['id'], profile_id)):
         raise NotAccessibleException(f'Profile with id {profile_id} is private.')
 
-    return [post.get_dict() for post in posts]
+    post_dicts = [post.get_dict() for post in posts]
+    for post_dict in post_dicts:
+        post_dict['comments'] = len(comment_service.get_for_post(post_dict['id']))
+        post_dict['likes'] = like_service.count_likes(post_dict['id']) - like_service.count_dislikes(post_dict['id'])
+    return post_dicts
 
-def delete(post_id: int, user: dict):
+def delete(post_id: int):
     post = post_repository.get(post_id)
 
     if not post:
         raise NotFoundException(f'Post with id {post_id} not found.')
-    elif post.user_id != user['id']:
-        raise InvalidDataException(f'You can\'t delete someone else\'s post.')
 
     favorite_service.delete_with_post(post_id)
     tagged_service.delete_with_post(post_id)
@@ -67,6 +75,18 @@ def delete(post_id: int, user: dict):
 
     return True
 
-def get_all():
+def get_all(page: int, per_page: int):
     posts = post_repository.get_all()
-    return [post.get_dict() for post in posts]
+    return [post.get_dict() for post in posts][(page-1)*per_page : page*per_page]
+
+def inappropriate(post_id: int, user: dict):
+    post = get(post_id, user)
+
+    data = {
+        'description': post['description'],
+        'image_url': post['image_url'],
+        'post_id': post['id'],
+        'reporter_id': user['id']
+    }
+
+    publish('post.inappropriate', data)
